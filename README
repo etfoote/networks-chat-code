@@ -4,3 +4,7 @@ I added comments to where I added new code to cclient.c and server.c and
 commented out code that Prof. Smith provided.
 
 Made pdu.c and pdu.h and incorporated the functions that the lab asked of me.
+
+Made new functiton inside cclient and server to get stuff working
+
+Also mad handleTable to account for all that jazz.
