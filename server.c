@@ -57,18 +57,6 @@ int main(int argc, char *argv[])
 	mainServerSocket = tcpServerSetup(portNumber);
 
 	serverControl(mainServerSocket); /* loop to unitl ^c */
-	/* old loop code for the ^c server stuff without polling
-	while(1)
-	{
-	// wait for client to connect
-	clientSocket = tcpAccept(mainServerSocket, DEBUG_FLAG);
-
-	
-	recvFromClient(clientSocket);
-		
-	 close the sockets
-	close(clientSocket); 
-}	*/
 	close(mainServerSocket);
 
 	
@@ -152,11 +140,6 @@ void processClient(int clientSocket)
 			default:
 				printf("Socket %d: Invalid flag received: %d\n", clientSocket, dataBuffer[0]);
 		}
-		/*
-		printf("Socket %d: Message received, length: %d Data: %s\n", clientSocket, messageLen, dataBuffer);
-		sendPDU(clientSocket, dataBuffer, messageLen);
-		printf("Socket %d: msg sent: %d bytes, text: %s\n", clientSocket, messageLen, dataBuffer);
-		*/
 	}
 	else /* else close */
 	{

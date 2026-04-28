@@ -52,11 +52,11 @@ int main(int argc, char * argv[])
 	int socketNum = 0;         //socket descriptor
 	checkArgs(argc, argv);
 	/* set up the TCP Client socket  */
-	socketNum = tcpClientSetup(argv[1], argv[2], DEBUG_FLAG);
+	socketNum = tcpClientSetup(argv[2], argv[3], DEBUG_FLAG);
 	/* sendToServer(socketNum); */ /* replaced with client control*/
-	strncpy(almightyHandle, argv[3], 100); /* copy handle to the almighty handle */
+	strncpy(almightyHandle, argv[1], 100); /* copy handle to the almighty handle */
 	almightyHandle[99] = '\0'; /* null terminate the almighty handle */
-	registerHandle(socketNum, argv[3]); /* send flag 1 for registration */
+	registerHandle(socketNum, argv[1]); /* send flag 1 for registration */
 	printf("$: ");
 	fflush(stdout);
 	clientControl(socketNum); /* added */
@@ -121,7 +121,7 @@ void checkArgs(int argc, char * argv[])
 	/* check command line arguments, updated to 4 to account for the handle*/
 	if (argc != 4)
 	{
-		printf("usage: %s host-name port-number handle\n", argv[0]);
+		printf("usage: %s handle host-name port-number\n", argv[0]);
 		exit(1);
 	}
 }
@@ -238,12 +238,16 @@ void registerHandle(int socketNum, char* handle)
 	buffer[1] = handleLen; /* handle len */
 	memcpy(buffer + 2, handle, handleLen); /* copy handle to buffer */
 	int sendLen = 2 + handleLen; /* total length to send */
+	if (sendLen > 100){ /* if bigger than 100 no mas */
+		printf("Invalid handle longer than 100 characters: %s\n", handle);
+		exit(-1);
+	}
 	sendPDU(socketNum, buffer, sendLen); /* send PDU */ /* removed int sent due to compiler errors*/
 	uint8_t response[MAXBUF];
 	recvPDU(socketNum, response, MAXBUF); /* receive response */ /* removed int recvBytes due to compiler errors*/
 	if (response[0] == 3) /* flag 3 so fail*/
 	{
-		printf("Handle registration failed: %s\n", handle);
+		printf("Handle already in use: %s\n", handle);
 		exit(-1);
 	}
 	else if (response[0] == 2) /* flag 2 so success */
@@ -292,7 +296,7 @@ void list(int socketNum){
 }
 void broadcast(int socketNum, uint8_t* buffer, int sendLen){
 	uint8_t flagBuf[MAXBUF];
-	char* token = strtok(NULL, " "); /* get the message */
+	char* token = strtok(NULL, ""); /* get the message */
 	char* message;
 	if (token == NULL){ 
 		message = "";
